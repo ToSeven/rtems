@@ -4,50 +4,33 @@
 #
 #
 ACLOCAL_AMFLAGS = -I ../../../../aclocal
+EXTRA_DIST =
 
 include $(top_srcdir)/../../../../automake/compile.am
+include $(top_srcdir)/../../bsp.am
 
-include_bspdir = $(includedir)/bsp
-include_libcpudir = $(includedir)/libcpu
-
-dist_project_lib_DATA = bsp_specs
+dist_project_lib_DATA = startup/bsp_specs
 
 ###############################################################################
 #                  Header                                                     #
 ###############################################################################
 
-include_HEADERS = include/bsp.h
-include_HEADERS += include/tm27.h
-
-nodist_include_bsp_HEADERS = ../../shared/include/bootcard.h
-include_bsp_HEADERS = ../shared/include/linker-symbols.h
-
-include_bsp_HEADERS += ../../../libbsp/shared/include/mm.h
-include_bsp_HEADERS += ../../shared/include/utility.h
-include_bsp_HEADERS += ../../shared/include/irq-generic.h
-include_bsp_HEADERS += ../../shared/include/irq-info.h
-include_bsp_HEADERS += ../../shared/include/stackalloc.h
-include_bsp_HEADERS += ../../shared/include/console-polled.h
-include_bsp_HEADERS += include/irq.h
-
-nodist_include_HEADERS = include/bspopts.h
-
 ###############################################################################
 #                  Data                                                       #
 ###############################################################################
-noinst_LIBRARIES = libbspstart.a
 
-libbspstart_a_SOURCES = start/start.S
+EXTRA_DIST += start/start.S
+start.$(OBJEXT): start/start.S
+	$(CPPASCOMPILE) -o $@ -c $<
+project_lib_DATA = start.$(OBJEXT)
 
-project_lib_DATA = start/start.$(OBJEXT)
-
-project_lib_DATA += startup/linkcmds
+project_lib_DATA += linkcmds
 
 ###############################################################################
 #                  LibBSP                                                     #
 ###############################################################################
 
-noinst_LIBRARIES += libbsp.a
+noinst_LIBRARIES = libbsp.a
 
 # Startup
 libbsp_a_SOURCES = ../../shared/bspreset.c
@@ -79,14 +62,12 @@ libbsp_a_SOURCES += ../../shared/src/irq-info.c
 libbsp_a_SOURCES += irq/irq.c
 
 # Cache
-libbsp_a_SOURCES += ../../../libcpu/shared/src/cache_manager.c
-libbsp_a_SOURCES += ../../shared/include/cache_.h
-libbsp_a_CPPFLAGS = -I$(srcdir)/../../shared/include
+libbsp_a_SOURCES += ../../../../../../bsps/shared/cache/nocache.c
 
 # debugio
 libbsp_a_SOURCES += console/console-io.c
 
 DISTCLEANFILES = include/bspopts.h
 
-include $(srcdir)/preinstall.am
 include $(top_srcdir)/../../../../automake/local.am
+include $(srcdir)/../../../../../../bsps/epiphany/epiphany_sim/headers.am

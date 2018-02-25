@@ -59,7 +59,6 @@ static void test_watchdog_config( void )
 {
   rtems_test_assert( _Watchdog_Nanoseconds_per_tick == 10000000 );
   rtems_test_assert( _Watchdog_Ticks_per_second == 100 );
-  rtems_test_assert( _Watchdog_Monotonic_max_seconds == 184467440737095516 );
   rtems_test_assert( rtems_clock_get_ticks_per_second() == 100 );
   #undef rtems_clock_get_ticks_per_second
   rtems_test_assert( rtems_clock_get_ticks_per_second() == 100 );
@@ -82,10 +81,18 @@ static uint64_t test_watchdog_tick( Watchdog_Header *header, uint64_t now )
 {
   ISR_LOCK_DEFINE( , lock, "Test" )
   ISR_lock_Context lock_context;
+  Watchdog_Control *first;
 
   _ISR_lock_ISR_disable_and_acquire( &lock, &lock_context );
+
   ++now;
-  _Watchdog_Tickle( header, now, &lock, &lock_context );
+  first = _Watchdog_Header_first( header );
+
+  if ( first != NULL ) {
+    _Watchdog_Tickle( header, first, now, &lock, &lock_context );
+  }
+
+  _ISR_lock_Release_and_ISR_enable( &lock, &lock_context );
   _ISR_lock_Destroy( &lock );
 
   return now;

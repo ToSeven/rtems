@@ -2,6 +2,9 @@ AC_PREREQ([2.69])
 AC_INIT([rtems-c-src-lib-libbsp-arm-atsam],[_RTEMS_VERSION],[https://devel.rtems.org/newticket])
 AC_CONFIG_SRCDIR([make/custom/atsamv.cfg])
 RTEMS_TOP(../../../../../..)
+RTEMS_SOURCE_TOP
+RTEMS_BUILD_TOP
+RTEMS_BSP_LINKCMDS
 
 RTEMS_CANONICAL_TARGET_CPU
 AM_INIT_AUTOMAKE([no-define nostdinc foreign 1.12.2])
@@ -69,6 +72,14 @@ RTEMS_BSPOPTS_HELP([ATSAM_MCK],
 [Frequency of the MCK in Hz. Set to 0 to force application defined speed.
 See startup/pmc-config.c for available clock configurations.])
 
+RTEMS_BSPOPTS_SET([ATSAM_SLOWCLOCK_USE_XTAL],[*],[1])
+RTEMS_BSPOPTS_HELP([ATSAM_SLOWCLOCK_USE_XTAL],
+[Use the external crystal as source for the slow clock instead of the internal
+RC oscillator. Note that on the ATSAM the NRST pin seems to depend on the slow
+clock as well as all watchdogs. If ATSAM_SLOWCLOCK_USE_XTAL is set to 1 without
+a external crystal connected, the controller might hang in the switching process
+without a working NRST pin. ])
+
 RTEMS_BSPOPTS_SET([ATSAM_CHANGE_CLOCK_FROM_SRAM],[*],[0])
 RTEMS_BSPOPTS_HELP([ATSAM_CHANGE_CLOCK_FROM_SRAM],
 [Move the functions that set up the clock into the SRAM.
@@ -101,6 +112,6 @@ ATSAM_LINKCMD([ATSAM_MEMORY_NOCACHE_SIZE],[size of NOCACHE section in bytes],[0x
 
 AC_CONFIG_FILES([
 Makefile
-startup/linkcmds.memory
+linkcmds.memory:startup/linkcmds.memory.in
 ])
 AC_OUTPUT

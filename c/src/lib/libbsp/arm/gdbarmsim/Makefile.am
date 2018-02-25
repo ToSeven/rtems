@@ -1,33 +1,23 @@
 ACLOCAL_AMFLAGS = -I ../../../../aclocal
+EXTRA_DIST =
 
 include $(top_srcdir)/../../../../automake/compile.am
+include $(top_srcdir)/../../bsp.am
 
-include_bspdir = $(includedir)/bsp
+dist_project_lib_DATA = startup/bsp_specs
 
-dist_project_lib_DATA = bsp_specs
-
-include_HEADERS = include/bsp.h
-include_HEADERS += include/tm27.h
-include_bsp_HEADERS = include/irq.h
-include_bsp_HEADERS += include/swi.h
-include_bsp_HEADERS += ../shared/include/start.h
-include_bsp_HEADERS += ../../shared/include/irq-generic.h
-include_bsp_HEADERS += ../../shared/include/irq-info.h
-
-nodist_include_HEADERS = include/bspopts.h
-nodist_include_bsp_HEADERS = ../../shared/include/bootcard.h
-nodist_include_bsp_HEADERS += ../../shared/include/console-polled.h
 DISTCLEANFILES = include/bspopts.h
 noinst_PROGRAMS =
 
 
-noinst_LIBRARIES = libbspstart.a
-libbspstart_a_SOURCES = ../shared/start/start.S
+EXTRA_DIST += ../shared/start/start.S
+start.$(OBJEXT): ../shared/start/start.S
+	$(CPPASCOMPILE) -o $@ -c $<
 project_lib_DATA = start.$(OBJEXT)
 
-dist_project_lib_DATA += startup/linkcmds
+project_lib_DATA += linkcmds
 
-noinst_LIBRARIES += libbsp.a
+noinst_LIBRARIES = libbsp.a
 libbsp_a_SOURCES =
 
 # startup
@@ -60,9 +50,7 @@ libbsp_a_SOURCES += ../../shared/src/irq-server.c
 libbsp_a_SOURCES += ../../shared/src/irq-shell.c
 
 # Cache
-libbsp_a_SOURCES += ../../../libcpu/shared/src/cache_manager.c
-libbsp_a_SOURCES += ../../shared/include/cache_.h
-libbsp_a_CPPFLAGS = -I$(srcdir)/../../shared/include
+libbsp_a_SOURCES += ../../../../../../bsps/shared/cache/nocache.c
 
 #libbsp_a_LIBADD = ../../../libcpu/@RTEMS_CPU@/shared/arm920.rel \
 #    ../../../libcpu/@RTEMS_CPU@/@RTEMS_CPU_MODEL@/clock.rel \
@@ -75,5 +63,5 @@ libbsp_a_SOURCES += ../shared/arm-cp15-set-exception-handler.c
 libbsp_a_SOURCES += ../shared/arm-cp15-set-ttb-entries.c
 endif
 
-include $(srcdir)/preinstall.am
 include $(top_srcdir)/../../../../automake/local.am
+include $(srcdir)/../../../../../../bsps/arm/gdbarmsim/headers.am

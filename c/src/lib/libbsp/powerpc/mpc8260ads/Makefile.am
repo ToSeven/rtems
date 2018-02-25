@@ -1,31 +1,28 @@
 ACLOCAL_AMFLAGS = -I ../../../../aclocal
+EXTRA_DIST =
 
 include $(top_srcdir)/../../../../automake/compile.am
+include $(top_srcdir)/../../bsp.am
 
-include_bspdir = $(includedir)/bsp
+dist_project_lib_DATA = startup/bsp_specs
 
-dist_project_lib_DATA = bsp_specs
-
-include_HEADERS = include/bsp.h
-include_HEADERS += include/tm27.h
-
-nodist_include_HEADERS = include/bspopts.h
-nodist_include_bsp_HEADERS = ../../shared/include/bootcard.h
 DISTCLEANFILES = include/bspopts.h
 
 noinst_PROGRAMS =
 
-
-dist_project_lib_DATA += startup/linkcmds
-
-noinst_LIBRARIES = libbspstart.a
-libbspstart_a_SOURCES = start/start.S
+EXTRA_DIST += start/start.S
+start.$(OBJEXT): start/start.S
+	$(CPPASCOMPILE) -o $@ -c $<
 project_lib_DATA = start.$(OBJEXT)
 
-libbspstart_a_SOURCES += ../../powerpc/shared/start/rtems_crti.S
+project_lib_DATA += linkcmds
+
+EXTRA_DIST += ../../powerpc/shared/start/rtems_crti.S
+rtems_crti.$(OBJEXT): ../../powerpc/shared/start/rtems_crti.S
+	$(CPPASCOMPILE) -o $@ -c $<
 project_lib_DATA += rtems_crti.$(OBJEXT)
 
-noinst_LIBRARIES += libbsp.a
+noinst_LIBRARIES = libbsp.a
 libbsp_a_SOURCES =
 
 # clock
@@ -33,10 +30,6 @@ libbsp_a_SOURCES += ../shared/clock/clock.c
 
 # console
 libbsp_a_SOURCES += console/console.c
-
-include_bsp_HEADERS = irq/irq.h \
-	../../shared/include/irq-generic.h \
-	../../shared/include/irq-info.h
 
 # irq
 libbsp_a_SOURCES += ../../shared/src/irq-default-handler.c
@@ -57,27 +50,21 @@ libbsp_a_SOURCES += ../../shared/bspclean.c \
 libbsp_a_SOURCES += ../../shared/bspreset.c
 
 if HAS_NETWORKING
-network_CPPFLAGS = -D__INSIDE_RTEMS_BSD_TCPIP_STACK__
-network_CPPFLAGS += -D__BSD_VISIBLE
-noinst_PROGRAMS += network.rel
-network_rel_SOURCES = network/network.c network/if_hdlcsubr.c
-network_rel_CPPFLAGS = $(AM_CPPFLAGS) $(network_CPPFLAGS)
-network_rel_LDFLAGS = $(RTEMS_RELLDFLAGS)
+libbsp_a_SOURCES += network/if_hdlcsubr.c
+libbsp_a_SOURCES += network/network.c
 endif
 
+libbsp_a_SOURCES += ../../../../../../bsps/powerpc/shared/cache/cache.c
+
 libbsp_a_LIBADD = ../../../libcpu/@RTEMS_CPU@/shared/cpuIdent.rel \
-    ../../../libcpu/@RTEMS_CPU@/shared/cache.rel \
     ../../../libcpu/@RTEMS_CPU@/@exceptions@/rtems-cpu.rel \
     ../../../libcpu/@RTEMS_CPU@/@exceptions@/exc_bspsupport.rel \
     ../../../libcpu/@RTEMS_CPU@/mpc8260/console-generic.rel \
     ../../../libcpu/@RTEMS_CPU@/mpc8260/cpm.rel \
     ../../../libcpu/@RTEMS_CPU@/mpc8260/mmu.rel \
     ../../../libcpu/@RTEMS_CPU@/mpc8260/timer.rel
-if HAS_NETWORKING
-libbsp_a_LIBADD += network.rel
-endif
 
-EXTRA_DIST = times
+EXTRA_DIST += times
 
-include $(srcdir)/preinstall.am
 include $(top_srcdir)/../../../../automake/local.am
+include $(srcdir)/../../../../../../bsps/powerpc/mpc8260ads/headers.am

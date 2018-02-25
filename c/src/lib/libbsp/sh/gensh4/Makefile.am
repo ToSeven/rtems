@@ -1,38 +1,23 @@
 ACLOCAL_AMFLAGS = -I ../../../../aclocal
+EXTRA_DIST =
 
 include $(top_srcdir)/../../../../automake/compile.am
+include $(top_srcdir)/../../bsp.am
 
-include_shdir = $(includedir)/sh
-include_rtems_scoredir = $(includedir)/rtems/score
-include_bspdir = $(includedir)/bsp
+dist_project_lib_DATA = startup/bsp_specs
 
-dist_project_lib_DATA = bsp_specs
-
-include_HEADERS = include/bsp.h
-include_HEADERS += include/tm27.h
-
-include_sh_HEADERS = include/sh/sh4uart.h
-
-include_rtems_score_HEADERS = include/rtems/score/sh7750_regs.h
-include_rtems_score_HEADERS += include/rtems/score/ipl.h
-include_rtems_score_HEADERS += include/rtems/score/iosh7750.h
-include_rtems_score_HEADERS += include/rtems/score/ispsh7750.h
-include_rtems_score_HEADERS += include/rtems/score/sh4_regs.h
-
-nodist_include_HEADERS = include/bspopts.h
-nodist_include_bsp_HEADERS = ../../shared/include/bootcard.h
 DISTCLEANFILES = include/bspopts.h
 
-include_HEADERS += include/sdram.h
-
-noinst_LIBRARIES = libbspstart.a
-libbspstart_a_SOURCES = start/start.S
+EXTRA_DIST += start/start.S
+start.$(OBJEXT): start/start.S
+	$(CPPASCOMPILE) -o $@ -c $<
 project_lib_DATA = start.$(OBJEXT)
 
-dist_project_lib_DATA += startup/linkcmds startup/linkcmds.rom \
-    startup/linkcmds.rom2ram
+project_lib_DATA += linkcmds
+dist_project_lib_DATA += startup/linkcmds.rom
+dist_project_lib_DATA += startup/linkcmds.rom2ram
 
-noinst_LIBRARIES += libbsp.a
+noinst_LIBRARIES = libbsp.a
 libbsp_a_SOURCES =
 
 # startup
@@ -53,11 +38,9 @@ libbsp_a_SOURCES += console/sh4uart.c
 libbsp_a_SOURCES += hw_init/hw_init.c
 
 # Cache
-libbsp_a_SOURCES += ../../../libcpu/shared/src/cache_manager.c
-libbsp_a_SOURCES += ../../shared/include/cache_.h
-libbsp_a_CPPFLAGS = -I$(srcdir)/../../shared/include
+libbsp_a_SOURCES += ../../../../../../bsps/shared/cache/nocache.c
 
-EXTRA_DIST = times
+EXTRA_DIST += times
 
-include $(srcdir)/preinstall.am
 include $(top_srcdir)/../../../../automake/local.am
+include $(srcdir)/../../../../../../bsps/sh/gensh4/headers.am

@@ -6,70 +6,36 @@
 #
 
 ACLOCAL_AMFLAGS = -I ../../../../aclocal
+EXTRA_DIST =
 
 include $(top_srcdir)/../../../../automake/compile.am
+include $(top_srcdir)/../../bsp.am
 
-include_bspdir = $(includedir)/bsp
-include_libcpudir = $(includedir)/libcpu
-
-dist_project_lib_DATA = bsp_specs
+dist_project_lib_DATA = startup/bsp_specs
 
 ###############################################################################
 #                  Header                                                     #
 ###############################################################################
 
-include_HEADERS = include/bsp.h
-include_HEADERS += include/tm27.h
-
-nodist_include_HEADERS = include/bspopts.h
-
-nodist_include_bsp_HEADERS = ../../shared/include/bootcard.h
-
-include_bsp_HEADERS =
-include_bsp_HEADERS += ../../shared/include/utility.h
-include_bsp_HEADERS += ../../shared/include/irq-generic.h
-include_bsp_HEADERS += ../../shared/include/irq-info.h
-include_bsp_HEADERS += ../../shared/include/stackalloc.h
-include_bsp_HEADERS += ../../shared/include/uart-output-char.h
-include_bsp_HEADERS += ../shared/include/arm-a8core-start.h
-include_bsp_HEADERS += ../shared/include/arm-cp15-start.h
-include_bsp_HEADERS += ../shared/include/arm-errata.h
-include_bsp_HEADERS += ../shared/include/arm-release-id.h
-include_bsp_HEADERS += ../shared/include/start.h
-include_bsp_HEADERS += include/irq.h
-include_bsp_HEADERS += include/i2c.h
-include_bsp_HEADERS += include/beagleboneblack.h
-include_bsp_HEADERS += include/bbb-gpio.h
-include_bsp_HEADERS += include/bbb-pwm.h
-
-include_libcpu_HEADERS =
-include_libcpu_HEADERS += ../../../libcpu/arm/shared/include/omap3.h
-include_libcpu_HEADERS += ../../../libcpu/arm/shared/include/am335x.h
-include_libcpu_HEADERS += ../../../libcpu/arm/shared/include/omap_timer.h
-
 ###############################################################################
 #                  Data                                                       #
 ###############################################################################
 
-noinst_LIBRARIES = libbspstart.a
-
-libbspstart_a_SOURCES = ../shared/start/start.S
-
+EXTRA_DIST += ../shared/start/start.S
+start.$(OBJEXT): ../shared/start/start.S
+	$(CPPASCOMPILE) -o $@ -c $<
 project_lib_DATA = start.$(OBJEXT)
 
-project_lib_DATA += startup/linkcmds
-project_lib_DATA += startup/linkcmds.beagle
-
-EXTRA_DIST = startup/linkcmds.beagle
+project_lib_DATA += linkcmds
+dist_project_lib_DATA += startup/linkcmds.beagle
 
 ###############################################################################
 #                  LibBSP                                                     #
 ###############################################################################
 
-noinst_LIBRARIES += libbsp.a
+noinst_LIBRARIES = libbsp.a
 
 libbsp_a_SOURCES =
-libbsp_a_CPPFLAGS =
 libbsp_a_LIBADD =
 
 # Shared
@@ -130,10 +96,7 @@ libbsp_a_SOURCES += clock.c
 libbsp_a_SOURCES += ../../shared/clockdrv_shell.h
 
 # Cache
-libbsp_a_SOURCES += ../../../libcpu/shared/src/cache_manager.c
-libbsp_a_SOURCES += ../shared/include/arm-cache-l1.h
-libbsp_a_SOURCES += ../shared/armv467ar-basic-cache/cache_.h
-libbsp_a_CPPFLAGS += -I$(srcdir)/../shared/armv467ar-basic-cache
+libbsp_a_SOURCES += ../../../../../../bsps/arm/shared/cache/cache-cp15.c
 
 ###############################################################################
 #                  Special Rules                                              #
@@ -141,5 +104,5 @@ libbsp_a_CPPFLAGS += -I$(srcdir)/../shared/armv467ar-basic-cache
 
 DISTCLEANFILES = include/bspopts.h
 
-include $(srcdir)/preinstall.am
 include $(top_srcdir)/../../../../automake/local.am
+include $(srcdir)/../../../../../../bsps/arm/beagle/headers.am

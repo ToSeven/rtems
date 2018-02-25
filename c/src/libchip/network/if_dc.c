@@ -99,6 +99,8 @@
  *  from being compiled on systems which can't support this driver.
  */
 
+#define __INSIDE_RTEMS_BSD_TCPIP_STACK__
+
 #if defined(DRIVER_SUPPORTED)
 	#undef DRIVER_SUPPORTED
 #endif
@@ -187,7 +189,7 @@
 #include <bsp/irq.h>
 
 
-#include "if_dcreg.h"
+#include <libchip/if_dcreg.h>
 
 
 #define DRIVER_PREFIX 	"tl"

@@ -1,62 +1,36 @@
 ACLOCAL_AMFLAGS = -I ../../../../aclocal
+EXTRA_DIST =
 
 include $(top_srcdir)/../../../../automake/compile.am
-
-include_bspdir = $(includedir)/bsp
+include $(top_srcdir)/../../bsp.am
 
 ###############################################################################
 #                  Data                                                       #
 ###############################################################################
 
-dist_project_lib_DATA = bsp_specs
+dist_project_lib_DATA = startup/bsp_specs
 
-noinst_LIBRARIES = libbspstart.a
+EXTRA_DIST += ../shared/start/start.S
+start.$(OBJEXT): ../shared/start/start.S
+	$(CPPASCOMPILE) -o $@ -c $<
+project_lib_DATA = start.$(OBJEXT)
 
-libbspstart_a_SOURCES = ../shared/start/start.S
-
-project_lib_DATA =
-project_lib_DATA += start.$(OBJEXT)
-project_lib_DATA += startup/linkcmds
-
-EXTRA_DIST = startup/linkcmds.lm3s6965 startup/linkcmds.lm3s6965_qemu startup/linkcmds.lm3s3749
+project_lib_DATA += linkcmds
+dist_project_lib_DATA += startup/linkcmds.lm3s3749
+dist_project_lib_DATA += startup/linkcmds.lm3s6965
+dist_project_lib_DATA += startup/linkcmds.lm3s6965_qemu
 
 ###############################################################################
 #                  Header                                                     #
 ###############################################################################
 
-include_HEADERS =
-include_HEADERS += include/tm27.h
-include_HEADERS += include/bsp.h
-
-nodist_include_HEADERS =
-nodist_include_HEADERS += include/bspopts.h
-
-nodist_include_bsp_HEADERS =
-nodist_include_bsp_HEADERS += ../../shared/include/bootcard.h
-
-include_bsp_HEADERS =
-include_bsp_HEADERS += ../../shared/include/utility.h
-include_bsp_HEADERS += ../../shared/include/irq-generic.h
-include_bsp_HEADERS += ../../shared/include/irq-info.h
-include_bsp_HEADERS += ../../shared/include/stackalloc.h
-include_bsp_HEADERS += ../shared/include/start.h
-include_bsp_HEADERS += ../shared/armv7m/include/armv7m-irq.h
-include_bsp_HEADERS += include/irq.h
-include_bsp_HEADERS += include/uart.h
-include_bsp_HEADERS += include/io.h
-include_bsp_HEADERS += include/syscon.h
-include_bsp_HEADERS += include/ssi.h
-include_bsp_HEADERS += include/lm3s69xx.h
-
 ###############################################################################
 #                  LibBSP                                                     #
 ###############################################################################
 
-noinst_LIBRARIES += libbsp.a
+noinst_LIBRARIES = libbsp.a
 
 libbsp_a_SOURCES =
-libbsp_a_CPPFLAGS =
-libbsp_a_LIBADD =
 
 # Shared
 libbsp_a_SOURCES += ../../shared/bootcard.c
@@ -105,9 +79,7 @@ libbsp_a_SOURCES += ../shared/armv7m/clock/armv7m-clock-config.c
 libbsp_a_SOURCES += ../../shared/timerstub.c
 
 # Cache
-libbsp_a_SOURCES += ../../../libcpu/shared/src/cache_manager.c
-libbsp_a_SOURCES += ../../../libcpu/arm/shared/cache/cache_.h
-libbsp_a_CPPFLAGS += -I$(srcdir)/../../../libcpu/arm/shared/include
+libbsp_a_SOURCES += ../../../../../../bsps/shared/cache/nocache.c
 
 # SSI
 libbsp_a_SOURCES += ssi/ssi.c
@@ -118,5 +90,5 @@ libbsp_a_SOURCES += ssi/ssi.c
 
 DISTCLEANFILES = include/bspopts.h
 
-include $(srcdir)/preinstall.am
 include $(top_srcdir)/../../../../automake/local.am
+include $(srcdir)/../../../../../../bsps/arm/lm3s69xx/headers.am

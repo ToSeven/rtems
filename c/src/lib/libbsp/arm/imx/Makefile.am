@@ -1,73 +1,34 @@
 ACLOCAL_AMFLAGS = -I ../../../../aclocal
+EXTRA_DIST =
 
 include $(top_srcdir)/../../../../automake/compile.am
+include $(top_srcdir)/../../bsp.am
 
-include_bspdir = $(includedir)/bsp
-include_arm_freescale_imxdir = $(includedir)/arm/freescale/imx
-
-dist_project_lib_DATA = bsp_specs
+dist_project_lib_DATA = startup/bsp_specs
 
 ###############################################################################
 #                  Header                                                     #
 ###############################################################################
 
-include_HEADERS = include/bsp.h
-include_HEADERS += include/tm27.h
-
-nodist_include_HEADERS = include/bspopts.h
-
-nodist_include_bsp_HEADERS = ../../shared/include/bootcard.h
-
-include_bsp_HEADERS =
-include_bsp_HEADERS += ../../shared/include/utility.h
-include_bsp_HEADERS += ../../shared/include/irq-generic.h
-include_bsp_HEADERS += ../../shared/include/irq-info.h
-include_bsp_HEADERS += ../../shared/include/stackalloc.h
-include_bsp_HEADERS += ../shared/include/start.h
-include_bsp_HEADERS += ../shared/include/arm-a9mpcore-regs.h
-include_bsp_HEADERS += ../shared/include/arm-a9mpcore-start.h
-include_bsp_HEADERS += ../shared/include/arm-cp15-start.h
-include_bsp_HEADERS += ../shared/include/arm-errata.h
-include_bsp_HEADERS += ../shared/include/arm-gic.h
-include_bsp_HEADERS += ../shared/include/arm-gic-irq.h
-include_bsp_HEADERS += ../shared/include/arm-gic-regs.h
-include_bsp_HEADERS += ../shared/include/arm-gic-tm27.h
-include_bsp_HEADERS += ../shared/include/arm-release-id.h
-include_bsp_HEADERS += include/irq.h
-
-include_arm_freescale_imx_HEADERS =
-include_arm_freescale_imx_HEADERS += include/arm/freescale/imx/imx_ccmvar.h
-include_arm_freescale_imx_HEADERS += include/arm/freescale/imx/imx_ecspireg.h
-include_arm_freescale_imx_HEADERS += include/arm/freescale/imx/imx_gpcreg.h
-include_arm_freescale_imx_HEADERS += include/arm/freescale/imx/imx_i2creg.h
-include_arm_freescale_imx_HEADERS += include/arm/freescale/imx/imx_iomuxreg.h
-include_arm_freescale_imx_HEADERS += include/arm/freescale/imx/imx_iomuxvar.h
-include_arm_freescale_imx_HEADERS += include/arm/freescale/imx/imx_srcreg.h
-include_arm_freescale_imx_HEADERS += include/arm/freescale/imx/imx_uartreg.h
-include_arm_freescale_imx_HEADERS += include/arm/freescale/imx/imx_wdogreg.h
-
 ###############################################################################
 #                  Data                                                       #
 ###############################################################################
 
-noinst_LIBRARIES = libbspstart.a
-
-libbspstart_a_SOURCES = ../shared/start/start.S
-
+EXTRA_DIST += ../shared/start/start.S
+start.$(OBJEXT): ../shared/start/start.S
+	$(CPPASCOMPILE) -o $@ -c $<
 project_lib_DATA = start.$(OBJEXT)
 
-project_lib_DATA += startup/linkcmds
-project_lib_DATA += startup/linkcmds.imx7
+project_lib_DATA += linkcmds
+dist_project_lib_DATA += startup/linkcmds.imx7
 
 ###############################################################################
 #                  LibBSP                                                     #
 ###############################################################################
 
-noinst_LIBRARIES += libbsp.a
+noinst_LIBRARIES = libbsp.a
 
 libbsp_a_SOURCES =
-libbsp_a_CPPFLAGS =
-libbsp_a_LIBADD =
 
 # Shared
 libbsp_a_SOURCES += ../../shared/bootcard.c
@@ -113,10 +74,7 @@ libbsp_a_SOURCES += ../../shared/clockdrv_shell.h
 libbsp_a_SOURCES += ../shared/arm-generic-timer-clock-config.c
 
 # Cache
-libbsp_a_SOURCES += ../../../libcpu/shared/src/cache_manager.c
-libbsp_a_SOURCES += ../shared/include/arm-cache-l1.h
-libbsp_a_SOURCES += ../shared/armv467ar-basic-cache/cache_.h
-libbsp_a_CPPFLAGS += -I$(srcdir)/../shared/armv467ar-basic-cache
+libbsp_a_SOURCES += ../../../../../../bsps/arm/shared/cache/cache-cp15.c
 
 # I2C
 libbsp_a_SOURCES += i2c/imx-i2c.c
@@ -133,5 +91,5 @@ libbsp_a_SOURCES += startup/bspstarthooks.c
 
 DISTCLEANFILES = include/bspopts.h
 
-include $(srcdir)/preinstall.am
 include $(top_srcdir)/../../../../automake/local.am
+include $(srcdir)/../../../../../../bsps/arm/imx/headers.am

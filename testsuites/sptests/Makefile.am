@@ -17,7 +17,7 @@ _SUBDIRS = \
     sperror01 sperror02 sperror03 \
     spfatal01 spfatal02 spfatal03 spfatal04 spfatal05 spfatal06 spfatal07 \
     spfatal08 spfatal09 spfatal10 spfatal11 spfatal12 spfatal13 spfatal14 \
-    spfatal15 spfatal16 spfatal17 spfatal18 spfatal19 spfatal20 \
+    spfatal15 spfatal16 \
     spfatal24 spfatal25 spfatal27\
     spfifo01 spfifo02 spfifo03 spfifo04 spfifo05 \
     spfreechain01 \
@@ -33,6 +33,7 @@ _SUBDIRS = \
     spsignal_err01 spport_err01 spmsgq_err01 spmsgq_err02 spsem_err01 \
     spsem_err02 sptask_err01 spevent_err03 sptask_err03 sptask_err02 \
     sptask_err04 spclock_err01
+_SUBDIRS += spthread01
 _SUBDIRS += spconsole01
 _SUBDIRS += spintrcritical24
 _SUBDIRS += spfatal29

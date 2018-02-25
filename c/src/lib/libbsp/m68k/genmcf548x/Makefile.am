@@ -1,38 +1,28 @@
 ACLOCAL_AMFLAGS = -I ../../../../aclocal
+EXTRA_DIST =
 
 include $(top_srcdir)/../../../../automake/compile.am
+include $(top_srcdir)/../../bsp.am
 
-include_bspdir = $(includedir)/bsp
-
-include_HEADERS = include/bsp.h
-include_HEADERS += include/tm27.h
-
-nodist_include_HEADERS = include/bspopts.h
-nodist_include_bsp_HEADERS = ../../shared/include/bootcard.h
-
-include_bsp_HEADERS =
-include_bsp_HEADERS += ../../shared/include/irq-generic.h
-include_bsp_HEADERS += ../../shared/include/irq-info.h
-include_bsp_HEADERS += include/irq.h
+dist_project_lib_DATA = startup/bsp_specs
 
 DISTCLEANFILES = include/bspopts.h
 noinst_PROGRAMS =
 
 
-noinst_LIBRARIES = libbspstart.a
-libbspstart_a_SOURCES = start/start.S
+EXTRA_DIST += start/start.S
+start.$(OBJEXT): start/start.S
+	$(CPPASCOMPILE) -o $@ -c $<
+project_lib_DATA = start.$(OBJEXT)
 
-dist_project_lib_DATA = bsp_specs
-dist_project_lib_DATA += startup/linkcmds.m5484FireEngine.flash
+project_lib_DATA += linkcmds
 dist_project_lib_DATA += startup/linkcmds.COBRA5475
 dist_project_lib_DATA += startup/linkcmds.m5484FireEngine
+dist_project_lib_DATA += startup/linkcmds.m5484FireEngine.flash
 
-project_lib_DATA = start.$(OBJEXT)
-project_lib_DATA += startup/linkcmds
-
-noinst_LIBRARIES += libbsp.a
+noinst_LIBRARIES = libbsp.a
 libbsp_a_SOURCES =
-libbsp_a_CPPFLAGS =
+libbsp_a_CPPFLAGS = $(AM_CPPFLAGS)
 
 # startup
 libbsp_a_SOURCES += \
@@ -59,25 +49,14 @@ libbsp_a_SOURCES += irq/irq.c
 libbsp_a_SOURCES += irq/intc-icr-init-values.c
 
 # Cache
-libbsp_a_SOURCES += ../../../libcpu/shared/src/cache_manager.c
-libbsp_a_SOURCES += ../include/cache_.h
-libbsp_a_CPPFLAGS += -I$(srcdir)/include
+libbsp_a_SOURCES += ../../../../../../bsps/m68k/genmcf548x/start/cache.c
 
 if HAS_NETWORKING
-network_CPPFLAGS = -D__INSIDE_RTEMS_BSD_TCPIP_STACK__
-noinst_PROGRAMS += network.rel
-network_rel_SOURCES = network/network.c
-network_rel_CPPFLAGS = $(AM_CPPFLAGS) \
-    $(network_CPPFLAGS)
-network_rel_LDFLAGS = $(RTEMS_RELLDFLAGS)
+libbsp_a_SOURCES += network/network.c
 endif
 
 libbsp_a_LIBADD = ../../../libcpu/@RTEMS_CPU@/shared/misc.rel \
                   ../../../libcpu/@RTEMS_CPU@/mcf548x/mcdma.rel
 
-if HAS_NETWORKING
-libbsp_a_LIBADD += network.rel
-endif
-
-include $(srcdir)/preinstall.am
 include $(top_srcdir)/../../../../automake/local.am
+include $(srcdir)/../../../../../../bsps/m68k/genmcf548x/headers.am

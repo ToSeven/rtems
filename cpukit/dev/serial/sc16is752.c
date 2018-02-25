@@ -234,11 +234,13 @@ static bool sc16is752_first_open(
   set_efr(ctx, EFR_ENHANCED_FUNC_ENABLE);
 
   rtems_termios_set_initial_baud(tty, 115200);
-  sc16is752_set_attributes(base, term);
+  ok = sc16is752_set_attributes(base, term);
+  if (!ok) {
+    return ok;
+  }
 
-  (*ctx->install_irq)(ctx);
-
-  return true;
+  ok = (*ctx->install_irq)(ctx);
+  return ok;
 }
 
 static void sc16is752_last_close(
@@ -282,6 +284,7 @@ static int sc16is752_ioctl(
 )
 {
   sc16is752_context *ctx = (sc16is752_context *)base;
+  uint8_t regval;
 
   switch (request) {
     case SC16IS752_SET_SLEEP_MODE:
@@ -289,6 +292,25 @@ static int sc16is752_ioctl(
       break;
     case SC16IS752_GET_SLEEP_MODE:
       *(int *)buffer = is_sleep_mode_enabled(ctx);
+      break;
+    case SC16IS752_SET_IOCONTROL:
+      regval = (*(uint8_t *)buffer) & ~SC16IS752_IOCONTROL_SRESET;
+      write_reg(ctx, SC16IS752_IOCONTROL, &regval, 1);
+      break;
+    case SC16IS752_GET_IOCONTROL:
+      read_reg(ctx, SC16IS752_IOCONTROL, (uint8_t *)buffer, 1);
+      break;
+    case SC16IS752_SET_IODIR:
+      write_reg(ctx, SC16IS752_IODIR, (uint8_t *)buffer, 1);
+      break;
+    case SC16IS752_GET_IODIR:
+      read_reg(ctx, SC16IS752_IODIR, (uint8_t *)buffer, 1);
+      break;
+    case SC16IS752_SET_IOSTATE:
+      write_reg(ctx, SC16IS752_IOSTATE, (uint8_t *)buffer, 1);
+      break;
+    case SC16IS752_GET_IOSTATE:
+      read_reg(ctx, SC16IS752_IOSTATE, (uint8_t *)buffer, 1);
       break;
     default:
       rtems_set_errno_and_return_minus_one(EINVAL);

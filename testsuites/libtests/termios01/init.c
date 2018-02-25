@@ -635,10 +635,11 @@ static rtems_status_code test_early_device_install(
    * after this test case.
    */
   for (i = 0; i < 4; ++i) {
-    errno = 0;
     fd = open( &dev[0], O_RDWR );
-    rtems_test_assert( fd == -1 );
-    rtems_test_assert( errno == ENXIO );
+    rtems_test_assert( fd == i );
+
+    rv = close( fd );
+    rtems_test_assert( rv == 0 );
   }
 
   rv = unlink( &dev[0] );
@@ -1011,9 +1012,6 @@ static rtems_task Init(
 
 /* include an extra slot for registering the termios one dynamically */
 #define CONFIGURE_MAXIMUM_DRIVERS 4
-
-/* one for the console and one for the test port */
-#define CONFIGURE_NUMBER_OF_TERMIOS_PORTS 3
 
 /* we need to be able to open the test device */
 #define CONFIGURE_LIBIO_MAXIMUM_FILE_DESCRIPTORS 4

@@ -4,6 +4,8 @@ AC_PREREQ([2.69])
 AC_INIT([rtems-c-src-lib-libcpu-sparc],[_RTEMS_VERSION],[https://devel.rtems.org/newticket])
 AC_CONFIG_SRCDIR([reg_win])
 RTEMS_TOP([../../../../..],[../../..])
+RTEMS_SOURCE_TOP
+RTEMS_BUILD_TOP
 
 RTEMS_CANONICAL_TARGET_CPU
 
@@ -18,9 +20,6 @@ RTEMS_PROG_CC_FOR_TARGET
 AM_PROG_CC_C_O
 RTEMS_CANONICALIZE_TOOLS
 RTEMS_PROG_CCAS
-
-AM_CONDITIONAL(has_instruction_cache, test "$RTEMS_CPU_MODEL" = "leon1" \
-|| test "$RTEMS_CPU_MODEL" = "leon2" || test "$RTEMS_CPU_MODEL" = "leon3" )
 
 RTEMS_AMPOLISH3
 

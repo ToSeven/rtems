@@ -2,36 +2,27 @@
 ##
 
 ACLOCAL_AMFLAGS = -I ../../../../aclocal
+EXTRA_DIST =
 
 include $(top_srcdir)/../../../../automake/compile.am
+include $(top_srcdir)/../../bsp.am
 
-include_bspdir = $(includedir)/bsp
+dist_project_lib_DATA = startup/bsp_specs
 
-dist_project_lib_DATA = bsp_specs
-
-include_HEADERS = include/bsp.h
-include_HEADERS += include/tm27.h
-include_bsp_HEADERS = ../shared/liblnk/regs.h
 #isr
-include_bsp_HEADERS += ../../shared/include/irq-generic.h
-include_bsp_HEADERS += ../../shared/include/irq-info.h
-include_bsp_HEADERS += include/irq.h
 #pci
-include_bsp_HEADERS += include/pci.h
 #irq
-include_bsp_HEADERS += ../shared/irq/i8259.h
-nodist_include_HEADERS = include/bspopts.h
-nodist_include_bsp_HEADERS = ../../shared/include/bootcard.h
 DISTCLEANFILES = include/bspopts.h
 
 
-noinst_LIBRARIES = libbspstart.a
-libbspstart_a_SOURCES = start/start.S ../shared/liblnk/regs.h
+EXTRA_DIST += start/start.S ../shared/liblnk/regs.h
+start.$(OBJEXT): start/start.S
+	$(CPPASCOMPILE) -o $@ -c $<
 project_lib_DATA = start.$(OBJEXT)
 
-dist_project_lib_DATA += startup/linkcmds
+project_lib_DATA += linkcmds
 
-noinst_LIBRARIES += libbsp.a
+noinst_LIBRARIES = libbsp.a
 libbsp_a_SOURCES =
 
 # startup
@@ -63,8 +54,9 @@ libbsp_a_SOURCES += ../../shared/console_control.c
 # timer
 libbsp_a_SOURCES += ../../shared/timerstub.c
 
-libbsp_a_LIBADD  = ../../../libcpu/@RTEMS_CPU@/shared/cache.rel
-libbsp_a_LIBADD += ../../../libcpu/@RTEMS_CPU@/shared/interrupts.rel
+libbsp_a_SOURCES += ../../../../../../bsps/shared/cache/nocache.c
+
+libbsp_a_LIBADD = ../../../libcpu/@RTEMS_CPU@/shared/interrupts.rel
 
 # pci
 libbsp_a_SOURCES += pci/pci.c
@@ -82,5 +74,5 @@ libbsp_a_SOURCES += irq/vectorisrs.c
 libbsp_a_SOURCES += irq/interruptmask.c
 libbsp_a_SOURCES += ../shared/irq/i8259.c
 
-include $(srcdir)/preinstall.am
 include $(top_srcdir)/../../../../automake/local.am
+include $(srcdir)/../../../../../../bsps/mips/malta/headers.am

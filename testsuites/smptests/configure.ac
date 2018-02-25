@@ -5,6 +5,8 @@ AC_INIT([rtems-c-src-tests-smptests],[_RTEMS_VERSION],[https://devel.rtems.org/n
 AC_CONFIG_SRCDIR([smp01])
 AC_CONFIG_HEADER([config.h])
 RTEMS_TOP([../..],[..])
+RTEMS_SOURCE_TOP
+RTEMS_BUILD_TOP
 
 RTEMS_CANONICAL_TARGET_CPU
 
@@ -53,6 +55,7 @@ AC_CHECK_DECLS([pthread_getattr_np],[],[],[[
 
 # Explicitly list all Makefiles here
 AC_CONFIG_FILES([Makefile
+smpopenmp01/Makefile
 smp01/Makefile
 smp02/Makefile
 smp03/Makefile

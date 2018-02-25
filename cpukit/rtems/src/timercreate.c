@@ -72,7 +72,7 @@ rtems_status_code _Timer_Fire(
 
     if ( _Timer_Is_interval_class( the_class ) ) {
       _Watchdog_Insert(
-        &cpu->Watchdog.Header[ PER_CPU_WATCHDOG_MONOTONIC ],
+        &cpu->Watchdog.Header[ PER_CPU_WATCHDOG_TICKS ],
         &the_timer->Ticker,
         cpu->Watchdog.ticks + interval
       );
@@ -80,7 +80,7 @@ rtems_status_code _Timer_Fire(
       _Watchdog_Insert(
         &cpu->Watchdog.Header[ PER_CPU_WATCHDOG_REALTIME ],
         &the_timer->Ticker,
-        _Watchdog_Realtime_from_seconds( interval )
+        _Watchdog_Ticks_from_seconds( interval )
       );
     }
 

@@ -55,6 +55,8 @@
  *     Original RTEMS modifications.
  */
 
+#define __INSIDE_RTEMS_BSD_TCPIP_STACK__
+
 #if defined(__i386__)
 
 /*#define DEBUG_OUT 0*/
@@ -92,7 +94,7 @@
 #include <net/if_types.h>
 
 #include "if_fxpreg.h"
-#include "if_fxpvar.h"
+#include <libchip/if_fxpvar.h>
 
 /*
  * some adaptation replacements for RTEMS

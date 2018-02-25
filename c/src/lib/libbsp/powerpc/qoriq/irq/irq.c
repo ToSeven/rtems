@@ -105,7 +105,11 @@ void bsp_interrupt_dispatch(uintptr_t exception_number)
 	}
 #endif
 
-	ev_int_iack(0, &vector);
+	/*
+	 * This works only if the "has-external-proxy" property is present in the
+	 * "epapr,hv-pic" device tree node.
+	 */
+	vector = PPC_SPECIAL_PURPOSE_REGISTER(FSL_EIS_EPR);
 
 	if (vector != SPURIOUS) {
 		uint32_t msr;
@@ -122,6 +126,23 @@ void bsp_interrupt_dispatch(uintptr_t exception_number)
 
 rtems_status_code bsp_interrupt_facility_initialize(void)
 {
+	unsigned int i;
+
+	for (i = BSP_INTERRUPT_VECTOR_MIN; i <= BSP_INTERRUPT_VECTOR_MAX; ++i) {
+		uint32_t config;
+		unsigned int priority;
+		uint32_t destination;
+		unsigned int err;
+
+		err = ev_int_get_config(i, &config, &priority, &destination);
+		if (err != EV_SUCCESS)
+			continue;
+
+		priority = QORIQ_PIC_PRIORITY_DEFAULT;
+
+		ev_int_set_config(i, config, priority, destination);
+	}
+
 	return RTEMS_SUCCESSFUL;
 }
 
@@ -336,7 +357,8 @@ rtems_status_code bsp_interrupt_facility_initialize(void)
 		for (i = BSP_INTERRUPT_VECTOR_MIN; i <= BSP_INTERRUPT_VECTOR_MAX; ++i) {
 			volatile qoriq_pic_src_cfg *src_cfg = get_src_cfg(i);
 
-			src_cfg->vpr = VPR_MSK | VPR_P | VPR_PRIORITY(1) | VPR_VECTOR(i);
+			src_cfg->vpr = VPR_MSK | VPR_P
+				| VPR_PRIORITY(QORIQ_PIC_PRIORITY_DEFAULT) | VPR_VECTOR(i);
 
 			if (!pic_is_ipi(i)) {
 				src_cfg->dr = 0x1;

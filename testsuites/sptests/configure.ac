@@ -5,6 +5,8 @@ AC_INIT([rtems-c-src-tests-sptests],[_RTEMS_VERSION],[https://devel.rtems.org/ne
 AC_CONFIG_SRCDIR([sp01])
 AC_CONFIG_HEADER([config.h])
 RTEMS_TOP([../..],[..])
+RTEMS_SOURCE_TOP
+RTEMS_BUILD_TOP
 
 RTEMS_CANONICAL_TARGET_CPU
 
@@ -36,6 +38,7 @@ AM_CONDITIONAL(HAS_SMP,test "$rtems_cv_RTEMS_SMP" = "yes")
 
 # Explicitly list all Makefiles here
 AC_CONFIG_FILES([Makefile
+spthread01/Makefile
 sptls04/Makefile
 spconsole01/Makefile
 spintrcritical24/Makefile
@@ -184,10 +187,6 @@ spfatal13/Makefile
 spfatal14/Makefile
 spfatal15/Makefile
 spfatal16/Makefile
-spfatal17/Makefile
-spfatal18/Makefile
-spfatal19/Makefile
-spfatal20/Makefile
 spfatal24/Makefile
 spfatal25/Makefile
 spfatal27/Makefile

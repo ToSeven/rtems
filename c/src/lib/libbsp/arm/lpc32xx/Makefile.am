@@ -6,77 +6,40 @@
 #
 
 ACLOCAL_AMFLAGS = -I ../../../../aclocal
+EXTRA_DIST =
 
 include $(top_srcdir)/../../../../automake/compile.am
+include $(top_srcdir)/../../bsp.am
 
-include_bspdir = $(includedir)/bsp
-
-dist_project_lib_DATA = bsp_specs
+dist_project_lib_DATA = startup/bsp_specs
 
 ###############################################################################
 #                  Header                                                     #
 ###############################################################################
 
-include_HEADERS = include/bsp.h
-include_HEADERS += include/tm27.h
-
-nodist_include_HEADERS = include/bspopts.h
-
-nodist_include_bsp_HEADERS = ../../shared/include/bootcard.h
-
-include_bsp_HEADERS =
-include_bsp_HEADERS += ../../shared/include/utility.h
-include_bsp_HEADERS += ../../shared/include/irq-generic.h
-include_bsp_HEADERS += ../../shared/include/irq-info.h
-include_bsp_HEADERS += ../../shared/include/stackalloc.h
-include_bsp_HEADERS += ../../shared/include/uart-output-char.h
-include_bsp_HEADERS += ../shared/include/start.h
-include_bsp_HEADERS += ../shared/include/arm-cp15-start.h
-include_bsp_HEADERS += ../shared/include/arm-errata.h
-include_bsp_HEADERS += ../shared/lpc/include/lpc-timer.h
-include_bsp_HEADERS += ../shared/lpc/include/lpc-dma.h
-include_bsp_HEADERS += ../shared/lpc/include/lpc-i2s.h
-include_bsp_HEADERS += ../shared/lpc/include/lpc-emc.h
-include_bsp_HEADERS += ../shared/lpc/include/lpc-lcd.h
-include_bsp_HEADERS += ../shared/include/arm-release-id.h
-include_bsp_HEADERS += include/irq.h
-include_bsp_HEADERS += include/mmu.h
-include_bsp_HEADERS += include/lpc32xx.h
-include_bsp_HEADERS += include/lpc-clock-config.h
-include_bsp_HEADERS += include/lpc-ethernet-config.h
-include_bsp_HEADERS += include/nand-mlc.h
-include_bsp_HEADERS += include/boot.h
-include_bsp_HEADERS += include/hsu.h
-include_bsp_HEADERS += include/i2c.h
-include_bsp_HEADERS += include/emc.h
-
 ###############################################################################
 #                  Data                                                       #
 ###############################################################################
 
-noinst_LIBRARIES = libbspstart.a
-
-libbspstart_a_SOURCES = ../shared/start/start.S
-
+EXTRA_DIST += ../shared/start/start.S
+start.$(OBJEXT): ../shared/start/start.S
+	$(CPPASCOMPILE) -o $@ -c $<
 project_lib_DATA = start.$(OBJEXT)
 
-project_lib_DATA += startup/linkcmds
-project_lib_DATA += startup/linkcmds.lpc32xx
-
-EXTRA_DIST = startup/linkcmds.lpc32xx_phycore \
-	startup/linkcmds.lpc32xx_mzx_stage_1 \
-	startup/linkcmds.lpc32xx_mzx_stage_2 \
-	startup/linkcmds.lpc32xx_mzx
+project_lib_DATA += linkcmds
+dist_project_lib_DATA += startup/linkcmds.lpc32xx
+dist_project_lib_DATA += startup/linkcmds.lpc32xx_phycore
+dist_project_lib_DATA += startup/linkcmds.lpc32xx_mzx_stage_1
+dist_project_lib_DATA += startup/linkcmds.lpc32xx_mzx_stage_2
+dist_project_lib_DATA += startup/linkcmds.lpc32xx_mzx
 
 ###############################################################################
 #                  LibBSP                                                     #
 ###############################################################################
 
-noinst_LIBRARIES += libbsp.a
+noinst_LIBRARIES = libbsp.a
 
 libbsp_a_SOURCES =
-libbsp_a_CPPFLAGS =
-libbsp_a_LIBADD =
 
 # Shared
 libbsp_a_SOURCES += ../../shared/bootcard.c
@@ -138,11 +101,7 @@ libbsp_a_SOURCES += misc/idle-thread.c
 # I2C
 
 # Cache
-libbsp_a_SOURCES += ../../../libcpu/shared/src/cache_manager.c
-libbsp_a_SOURCES += ../shared/include/arm-cache-l1.h
-libbsp_a_SOURCES += ../shared/armv467ar-basic-cache/cache_.h
-libbsp_a_CPPFLAGS += -I$(srcdir)/../shared/armv467ar-basic-cache
-
+libbsp_a_SOURCES += ../../../../../../bsps/arm/shared/cache/cache-cp15.c
 
 # Start hooks
 libbsp_a_SOURCES += startup/bspstarthooks.c
@@ -152,15 +111,7 @@ libbsp_a_SOURCES += startup/bspstarthooks.c
 ###############################################################################
 
 if HAS_NETWORKING
-
-noinst_PROGRAMS = network.rel
-
-network_rel_SOURCES = ../shared/lpc/network/lpc-ethernet.c
-network_rel_CPPFLAGS = $(AM_CPPFLAGS) -D__INSIDE_RTEMS_BSD_TCPIP_STACK__ -D__BSD_VISIBLE
-network_rel_LDFLAGS = $(RTEMS_RELLDFLAGS)
-
-libbsp_a_LIBADD += network.rel
-
+libbsp_a_SOURCES += ../shared/lpc/network/lpc-ethernet.c
 endif
 
 ###############################################################################
@@ -169,5 +120,5 @@ endif
 
 DISTCLEANFILES = include/bspopts.h
 
-include $(srcdir)/preinstall.am
 include $(top_srcdir)/../../../../automake/local.am
+include $(srcdir)/../../../../../../bsps/arm/lpc32xx/headers.am

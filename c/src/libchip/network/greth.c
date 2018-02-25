@@ -9,6 +9,8 @@
  * 2007-09-07, Ported GBIT support from 4.6.5
  */
 
+#define __INSIDE_RTEMS_BSD_TCPIP_STACK__
+
 #include <rtems.h>
 #include <bsp.h>
 
@@ -22,7 +24,7 @@
 #include <stdarg.h>
 #include <rtems/error.h>
 #include <rtems/rtems_bsdnet.h>
-#include "greth.h"
+#include <libchip/greth.h>
 
 #include <sys/param.h>
 #include <sys/mbuf.h>

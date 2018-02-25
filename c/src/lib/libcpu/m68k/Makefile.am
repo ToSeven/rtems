@@ -6,13 +6,6 @@ noinst_PROGRAMS =
 
 if shared
 
-noinst_PROGRAMS += shared/cache.rel
-shared_cache_rel_SOURCES = shared/cache/cache.c
-shared_cache_rel_SOURCES += shared/cache/cache_.h
-shared_cache_rel_SOURCES += ../shared/src/cache_manager.c
-shared_cache_rel_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/shared/cache
-shared_cache_rel_LDFLAGS = $(RTEMS_RELLDFLAGS)
-
 ## shared/misc
 
 # gcc doesn't recognize difference between the cpu32 and cpu32+ so we have to
@@ -67,10 +60,6 @@ EXTRA_DIST = m68040/fpsp/README
 
 if mcf5206
 # mcf5206/include
-include_mcf5206dir = $(includedir)/mcf5206
-include_mcf5206_HEADERS = mcf5206/include/mcf5206e.h mcf5206/include/mcfmbus.h \
-    mcf5206/include/mcfuart.h
-
 ## mcf5206/clock
 noinst_PROGRAMS += mcf5206/clock.rel
 mcf5206_clock_rel_SOURCES = mcf5206/clock/ckinit.c
@@ -96,64 +85,8 @@ mcf5206_timer_rel_CPPFLAGS = $(AM_CPPFLAGS)
 mcf5206_timer_rel_LDFLAGS = $(RTEMS_RELLDFLAGS)
 endif
 
-if mcf5223x
-## mcf5223x/include
-include_mcf5223xdir = $(includedir)/mcf5223x
-include_mcf5223x_HEADERS = mcf5223x/include/mcf5223x.h
-
-## mcf5223x/cache
-noinst_PROGRAMS += mcf5223x/cachepd.rel
-mcf5223x_cachepd_rel_SOURCES = mcf5223x/cache/cachepd.c
-mcf5223x_cachepd_rel_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/shared/cache
-mcf5223x_cachepd_rel_LDFLAGS = $(RTEMS_RELLDFLAGS)
-endif
-
-if mcf5225x
-## mcf5225x/include
-include_mcf5225xdir = $(includedir)/mcf5225x
-include_mcf5225x_HEADERS = mcf5225x/include/mcf5225x.h
-
-# mcf5225x/cache
-noinst_PROGRAMS += mcf5225x/cachepd.rel
-mcf5225x_cachepd_rel_SOURCES = mcf5225x/cache/cachepd.c
-mcf5225x_cachepd_rel_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/shared/cache
-mcf5225x_cachepd_rel_LDFLAGS = $(RTEMS_RELLDFLAGS)
-
-# Network
-if HAS_NETWORKING
-include_mcf5225x_HEADERS += mcf5225x/include/fec.h
-endif ## HAS_NETWORKING
-endif
-
-if mcf5235
-## mcf5235/include
-include_mcf5235dir = $(includedir)/mcf5235
-include_mcf5235_HEADERS = mcf5235/include/mcf5235.h
-
-## mcf5235/cache
-noinst_PROGRAMS += mcf5235/cachepd.rel
-mcf5235_cachepd_rel_SOURCES = mcf5235/cache/cachepd.c
-mcf5235_cachepd_rel_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/shared/cache
-mcf5235_cachepd_rel_LDFLAGS = $(RTEMS_RELLDFLAGS)
-endif
-
-if mcf532x
-## mcf532x/include
-include_mcf532xdir = $(includedir)/mcf532x
-include_mcf532x_HEADERS = mcf532x/include/mcf532x.h
-
-## mcf532x/cache
-noinst_PROGRAMS += mcf532x/cachepd.rel
-mcf532x_cachepd_rel_SOURCES = mcf532x/cache/cachepd.c
-mcf532x_cachepd_rel_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/shared/cache
-mcf532x_cachepd_rel_LDFLAGS = $(RTEMS_RELLDFLAGS)
-endif
-
 if mcf5272
 ## mcf5272/include
-include_mcf5272dir = $(includedir)/mcf5272
-include_mcf5272_HEADERS = mcf5272/include/mcf5272.h
-
 ## clock
 noinst_PROGRAMS += mcf5272/clock.rel
 mcf5272_clock_rel_SOURCES = mcf5272/clock/ckinit.c
@@ -167,26 +100,10 @@ mcf5272_timer_rel_CPPFLAGS = $(AM_CPPFLAGS)
 mcf5272_timer_rel_LDFLAGS = $(RTEMS_RELLDFLAGS)
 endif
 
-if mcf5282
-## mcf5282/include
-include_mcf5282dir = $(includedir)/mcf5282
-include_mcf5282_HEADERS = mcf5282/include/mcf5282.h
-
-noinst_PROGRAMS += mcf5282/cachepd.rel
-mcf5282_cachepd_rel_SOURCES = mcf5282/cache/cachepd.c
-mcf5282_cachepd_rel_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/shared/cache
-mcf5282_cachepd_rel_LDFLAGS = $(RTEMS_RELLDFLAGS)
-endif
-
 if mcf548x
 ## mcf548x/include
-include_mcf548xdir = $(includedir)/mcf548x
-include_mcf548x_HEADERS = mcf548x/include/mcf548x.h
-
 ## mcf548x/mcdma
 noinst_PROGRAMS += mcf548x/mcdma.rel
-include_mcf548x_HEADERS +=  mcf548x/mcdma/MCD_progCheck.h mcf548x/mcdma/MCD_dma.h \
-                            mcf548x/mcdma/MCD_tasksInit.h mcf548x/mcdma/mcdma_glue.h
 mcf548x_mcdma_rel_SOURCES = mcf548x/mcdma/MCD_dmaApi.c mcf548x/mcdma/MCD_tasksInit.c \
                             mcf548x/mcdma/MCD_tasks.c  mcf548x/mcdma/mcdma_glue.c
 
@@ -194,5 +111,4 @@ mcf548x_mcdma_rel_CPPFLAGS = $(AM_CPPFLAGS)
 mcf548x_mcdma_rel_LDFLAGS = $(RTEMS_RELLDFLAGS)
 endif
 
-include $(srcdir)/preinstall.am
 include $(top_srcdir)/../../../automake/local.am

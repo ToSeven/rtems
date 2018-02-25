@@ -1,33 +1,24 @@
 ACLOCAL_AMFLAGS = -I ../../../../aclocal
+EXTRA_DIST =
 
 include $(top_srcdir)/../../../../automake/compile.am
+include $(top_srcdir)/../../bsp.am
 
-include_bspdir = $(includedir)/bsp
+dist_project_lib_DATA = startup/bsp_specs
 
-dist_project_lib_DATA = bsp_specs
-
-include_HEADERS = include/bsp.h
-include_HEADERS += include/tm27.h
-
-include_bsp_HEADERS =
-
-nodist_include_HEADERS = include/bspopts.h
-nodist_include_bsp_HEADERS = ../../shared/include/bootcard.h
 DISTCLEANFILES = include/bspopts.h
 noinst_PROGRAMS =
 
-include_HEADERS += include/ep7312.h
-
-noinst_LIBRARIES = libbspstart.a
-libbspstart_a_SOURCES = start/start.S
+EXTRA_DIST += start/start.S
+start.$(OBJEXT): start/start.S
+	$(CPPASCOMPILE) -o $@ -c $<
 project_lib_DATA = start.$(OBJEXT)
 
-dist_project_lib_DATA += startup/linkcmds
+project_lib_DATA += linkcmds
 
-noinst_LIBRARIES += libbsp.a
+noinst_LIBRARIES = libbsp.a
 libbsp_a_SOURCES =
 
-include_HEADERS += ../../arm/shared/comm/uart.h
 # startup
 libbsp_a_SOURCES += \
     ../../shared/bspgetworkarea.c \
@@ -49,9 +40,6 @@ libbsp_a_SOURCES += console/uart.c ../../shared/console.c \
 libbsp_a_SOURCES += timer/timer.c
 
 # irq
-include_bsp_HEADERS += ../../shared/include/irq-generic.h \
-	../../shared/include/irq-info.h \
-	irq/irq.h
 libbsp_a_SOURCES += ../../shared/src/irq-default-handler.c
 libbsp_a_SOURCES += ../../shared/src/irq-generic.c
 libbsp_a_SOURCES += ../../shared/src/irq-info.c
@@ -62,23 +50,11 @@ libbsp_a_SOURCES += irq/irq.c
 libbsp_a_SOURCES += irq/bsp_irq_asm.S
 
 # Cache
-libbsp_a_SOURCES += ../../../libcpu/shared/src/cache_manager.c
-libbsp_a_SOURCES += ../../shared/include/cache_.h
-libbsp_a_CPPFLAGS = -I$(srcdir)/../../shared/include
+libbsp_a_SOURCES += ../../../../../../bsps/shared/cache/nocache.c
 
 if HAS_NETWORKING
-network_CPPFLAGS = -D__INSIDE_RTEMS_BSD_TCPIP_STACK__
-noinst_PROGRAMS += network.rel
-network_rel_SOURCES = network/network.c
-network_rel_CPPFLAGS = $(AM_CPPFLAGS) $(network_CPPFLAGS)
-network_rel_LDFLAGS = $(RTEMS_RELLDFLAGS)
+libbsp_a_SOURCES += network/network.c
 endif
 
-# libcpu libraries could go here
-libbsp_a_LIBADD =
-if HAS_NETWORKING
-libbsp_a_LIBADD += network.rel
-endif
-
-include $(srcdir)/preinstall.am
 include $(top_srcdir)/../../../../automake/local.am
+include $(srcdir)/../../../../../../bsps/arm/edb7312/headers.am
